@@ -1,7 +1,8 @@
 ComputeSampleSize <-function (dat,input,...){
 ## ---- Unpaired_T ----
         if (input$test_type == "Unpaired T-test"){
-                if (ncol(dat) >2){return(NULL)}
+                if (ncol(dat) > 2){return(NULL)}
+                if (nrow(dat) < 2){return(NULL)}
                 dat_melt <- melt(dat, 
                                  variable.name = 'condition',
                                  value.name = 'result',
@@ -16,11 +17,12 @@ ComputeSampleSize <-function (dat,input,...){
                         unclass() %>% 
                         as_tibble
                 Sample_size$note <- paste("Note:", Sample_size$note)
-                print(Sample_size)
+                return(Sample_size)
 ## ---- end_of_chunk ----
 ## ---- Paired_T ----        
         } else if (input$test_type == "Paired T-test"){ 
                 if (ncol(dat) > 2){return(NULL)}
+                if (nrow(dat) < 2){return(NULL)}
                 dat_complete <- dat[complete.cases(dat),]
                 n <- nrow(dat_complete)
                 dat_complete$id <- (1:n)
@@ -45,14 +47,14 @@ ComputeSampleSize <-function (dat,input,...){
                         unclass() %>% 
                         as_tibble
                 Sample_size$note <- paste("Note:", Sample_size$note)
-                print(Sample_size)
+                return(Sample_size)
            
 ## ---- end_of_chunk ----
 ## ---- Chi ----  
                      
         } else if (input$test_type == "Chi-squared"){
-                if (ncol(dat) >2){return(NULL)}
-                if (nrow(dat) >2){return(NULL)}
+                if (ncol(dat) > 2){return(NULL)}
+                if (nrow(dat) > 2){return(NULL)}
                 dat_melt <- melt(dat,
                                  variable.name = 'condition',
                                  value.name = 'proportion')
@@ -65,7 +67,9 @@ ComputeSampleSize <-function (dat,input,...){
                         unclass() %>% 
                         as_tibble
                 Sample_size$note <- paste("Note:", Sample_size$note)
-                print(Sample_size)
+                Sample_size <- Sample_size %>%
+                        select("n", "h", everything())
+                return(Sample_size)
                 
 ## ---- end_of_chunk ----
 ## ---- Onew_ANOVA ----  
@@ -94,7 +98,9 @@ ComputeSampleSize <-function (dat,input,...){
                 Sample_size$n <- Sample_size$n/Sample_size$k
                 Sample_size$note <- c("Note: n is the sample size *in each group*")
                 Sample_size$method <- c("One-way ANOVA")
-                print(Sample_size)
+                Sample_size <- Sample_size %>%
+                        select("n", "f", everything())
+                return(Sample_size)
       
 ## ---- end_of_chunk ----
 ## ---- Twow_ANOVA ----  
@@ -163,7 +169,9 @@ ComputeSampleSize <-function (dat,input,...){
                 Sample_size$n <- Sample_size$n/Sample_size$ng
                 Sample_size$note <- c("Note: n is the sample size *in each group*")
                 Sample_size$method <- c("Two-way ANOVA")
-                print(Sample_size)
+                Sample_size <- Sample_size %>%
+                        select("name", "n", "f", everything())
+                return(Sample_size)
         }
 ## ---- end_of_chunk ----
         

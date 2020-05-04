@@ -72,7 +72,12 @@ ui <- fluidPage(
                                                 
                                                 # Output: Notes re: power analysis
                                                 h4(textOutput("test_notes"), 
-                                                   class = "text-primary"))
+                                                   class = "text-muted"),
+                                                
+                                                # Output: Explaining the variables
+                                                htmlOutput("variables")
+                                        )
+                                        
                                         
                        ),
                        conditionalPanel(condition = "output.error",
@@ -88,7 +93,7 @@ ui <- fluidPage(
                        wellPanel(
                                h3("Application Instructions", 
                                   class = "text-primary"),
-                               p ("To begin, load a .csv file containing pilot data.
+                               p("To begin, load a .csv file containing pilot data.
                                 Then select the desired statistical 
                                 test using the pull down menu.
                                 You may also select the desired 
@@ -125,11 +130,11 @@ ui <- fluidPage(
                                 effects and the interaction
                                 effect will be calculated.
                                 Data should be arranged in columns as follows:"), 
-                               ul(
-                                       li("Column 1: Factor A Condition 1"),
-                                       li("Column 2: Factor A Condition 2"),
-                                       li("Column 3: Factor B Condition 1"),
-                                       li("Column 4: Factor B Condition 2")
+                               tags$ul(
+                                       tags$li("Column 1: Factor A Condition 1"),
+                                       tags$li("Column 2: Factor A Condition 2"),
+                                       tags$li("Column 3: Factor B Condition 1"),
+                                       tags$li("Column 4: Factor B Condition 2")
                                )
                                
                        ),
@@ -184,6 +189,44 @@ server <- function (input, output){
                                 dplyr::first()
                 }
         })
+        
+        output$variables <- renderUI({
+                result<-dataOutput()
+                if (!is.null(result)){
+                        method <- dplyr::pull(result,method)
+                        str0 <- paste(
+                                br(),
+                                c('<h4 class = "text-primary"> Reported Variables </h4>'),
+                                c('<p>n = sample size</p>'))
+                        str2 <- paste(
+                                c('<p>alpha = significance level 
+                                          (aka false positive rate)</p>'),
+                                c('<p>power = statistical power 
+                                          (aka 1 - false negative rate)</p>')
+                        )
+                        if (grepl('t-test', method)){
+                                str1<- c('<p>d = effect size (Cohens D)</p>')
+                                str3<- c('<p>alternative = direction of the
+                                          alternative hypothesis</p>')
+        
+                        } else if (grepl('proportion', method)){
+                                str1<- c('<p>h = effect size</p>')
+                                str3<- c(' ')
+                                
+                        } else if (grepl('One-way ANOVA', method)){
+                                str1<- paste(
+                                        c('<p>f = effect size (f-ratio)</p>'),
+                                        c('<p>k = number of groups</p>'))
+                                str3<- c(' ')
+                                
+                        } else if (grepl('Two-way ANOVA', method)){
+                                str1<- c('<p>f = effect size (f-ratio)</p>')
+                                str3<- paste(c('<p>ndf = numerator degrees of freedom</p>'),
+                                             c('<p>ddf = denominator degrees of freedom</p>'),
+                                             c('<p>ng = number of groups</p>'))
+                        }
+                        HTML(paste(str0,str1,str2,str3))
+                }})
         
         output$error <- renderUI({
                 result<-dataOutput() 
