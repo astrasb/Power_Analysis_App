@@ -17,7 +17,7 @@ These requirements may act as a barrier for some researchers. The overall goal o
 ## Dependencies   
 ```{r echo = FALSE}
 library(knitr)
-read_chunk("Power_Analysis_App.r")
+read_chunk("Power_Analysis_App.R")
 ```
 The shiny script is located in the file `Power_Analysis_App.R`, which in turn calls `ComputeSampleSize.R` for the actual calculations. Taken together, the app uses several libraries to calculate effect sizes and power analyses for the separate statistical tests.  
 Key amongst these is the WebPower libary, which handles the power analyses. For background/additional references relating to the WebPower library, [the manual is avaliable here](https://webpower.psychstat.org/wiki/_media/grant/webpower_manual_book.pdf).
