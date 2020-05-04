@@ -34,6 +34,10 @@ ui <- fluidPage(
                                fileInput("loadfile",
                                          "Load a .csv file",
                                          multiple = FALSE),
+                               p("For .csv file formatting tips
+                                 and examples, see Application Instructions
+                                 section, below.",
+                                 class = "text-muted"),
                                style = "padding-top: 0px;
                                padding-bottom: 0px;"
                                
@@ -81,8 +85,7 @@ ui <- fluidPage(
                                                 tableOutput("sample_size"),
                                                 
                                                 # Output: Notes re: power analysis
-                                                h4(textOutput("test_notes"), 
-                                                   class = "text-muted"),
+                                                htmlOutput("test_notes"),
                                                 
                                                 # Output: Explaining the variables
                                                 htmlOutput("variables")
@@ -149,17 +152,17 @@ ui <- fluidPage(
                                fluidRow(
                                        column(6,
                                               div(selectInput("example_type", 
-                                                              "Download example .csv file:", 
-                                                              choices = c("Unpaired T-test", 
-                                                                          "Paired T-test", 
-                                                                          "Chi-squared",
-                                                                          "One-way ANOVA", 
-                                                                          "Two-way ANOVA"),
-                                                              selected = "Unpaired T-test"),
+                                                "Download example .csv file:", 
+                                                choices = c("Unpaired T-test", 
+                                                            "Paired T-test", 
+                                                            "Chi-squared",
+                                                            "One-way ANOVA", 
+                                                            "Two-way ANOVA"),
+                                                  selected = "Unpaired T-test"),
                                                   class = "text-warning",
                                                   style = "padding-bottom: 0px"),
                                               div(downloadLink('downloadData',
-                                                                 'Download'),
+                                                               'Download'),
                                                   style = "text-align: right;
                                                   padding-top: 0px"))),
                                style = "padding-top: 0px;
@@ -177,6 +180,22 @@ ui <- fluidPage(
                                 file with raw data as input, and calculates sample 
                                 sizes for specified power and alpha levels for several 
                                 common statistical tests.", class = "text-muted"),
+                               p("For all these tests, the assumption is made that the 
+                               data are pulled from a normal distribution, 
+                               i.e. that the statistical test used will be parametric. 
+                               Keep in mind that sample sizes provided may be an 
+                               underestimation in the case where the intention is 
+                               to use non-parametric statistical tests. 
+                               The Prism User Guide suggests that in the absence of 
+                               easy-to-apply mathematical tools for conducting power 
+                               analyses of non-parametric data, ", 
+                                 a(href = "https://www.graphpad.com/guides/prism/7/
+                                   statistics/stat_sample_size_for_nonparametric_.htm",
+                                   "values can be estimated calculating the sample size 
+                                   for a parametric test and adding 15%",
+                                   .noWS = "outside"),".",
+                                 .noWS = c("after-begin", "before-end"), 
+                                 class = "text-muted"),
                                p("These calculations are primarily powered by the 
                                 WebPower Library. For background and/or additional 
                                 references relating to the WebPower library, ", 
@@ -186,6 +205,8 @@ ui <- fluidPage(
                                  .noWS = c("after-begin", "before-end"), 
                                  class = "text-muted"
                                ),
+                               p("Created by Astra S, Bryant, PhD",
+                                 class = "text-muted"),
                                style = "padding-top: 0px;
                                padding-bottom: 0px;")
                 )))
@@ -216,11 +237,18 @@ server <- function (input, output){
                 } 
         })
         
-        output$test_notes <- renderText({
+        output$test_notes <- renderUI({
                 result<-dataOutput() 
                 if (!is.null(result)){
-                        dplyr::pull(result,note) %>%
+                        str0 <- c('<h4 class = "text-primary">Notes</h4>')
+                        str1 <- dplyr::pull(result,note) %>%
                                 dplyr::first()
+                        str2 <- c('<p class = "text-muted">
+                        This calculation assumes that data are 
+                        pulled from a normal distribution. If you
+                        plan to use a non-parametric test, add 15%
+                        to the calculated n.</p>')
+                        HTML(paste(str0, str1,str2))
                 }
         })
         
@@ -239,25 +267,29 @@ server <- function (input, output){
                                 c('<p>power = statistical power 
                                           (aka 1 - false negative rate)</p>')
                         )
-                        if (grepl('t-test', method)){
+                        if (grepl('t-test', method[1])){
                                 str1<- c('<p>d = effect size (Cohens D)</p>')
                                 str3<- c('<p>alternative = direction of the
                                           alternative hypothesis</p>')
                                 
-                        } else if (grepl('proportion', method)){
+                        } else if (grepl('proportion', method[1])){
                                 str1<- c('<p>h = effect size</p>')
                                 str3<- c(' ')
                                 
-                        } else if (grepl('One-way ANOVA', method)){
+                        } else if (grepl('One-way', method[1])){
                                 str1<- paste(
-                                        c('<p>f = effect size (f-ratio)</p>'),
-                                        c('<p>k = number of groups</p>'))
+                                        c('<p>
+                                          f = effect size (f-ratio)</p>'),
+                                        c('<p>
+                                          k = number of groups</p>'))
                                 str3<- c(' ')
                                 
-                        } else if (grepl('Two-way ANOVA', method)){
+                        } else if (grepl('Two-way', method[1])){
                                 str1<- c('<p>f = effect size (f-ratio)</p>')
-                                str3<- paste(c('<p>ndf = numerator degrees of freedom</p>'),
-                                             c('<p>ddf = denominator degrees of freedom</p>'),
+                                str3<- paste(c('<p>ndf = 
+                                               numerator degrees of freedom</p>'),
+                                             c('<p>ddf = 
+                                               denominator degrees of freedom</p>'),
                                              c('<p>ng = number of groups</p>'))
                         }
                         HTML(paste(str0,str1,str2,str3))

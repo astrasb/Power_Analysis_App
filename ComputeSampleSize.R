@@ -16,7 +16,7 @@ ComputeSampleSize <-function (dat,input,...){
                                     type = "two.sample")%>% 
                         unclass() %>% 
                         as_tibble
-                Sample_size$note <- paste("Note:", Sample_size$note)
+                #Sample_size$note <- paste("Note:", Sample_size$note)
                 return(Sample_size)
 ## ---- end_of_chunk ----
 ## ---- Paired_T ----        
@@ -46,7 +46,7 @@ ComputeSampleSize <-function (dat,input,...){
                                     type = "paired") %>% 
                         unclass() %>% 
                         as_tibble
-                Sample_size$note <- paste("Note:", Sample_size$note)
+                #Sample_size$note <- paste("Note:", Sample_size$note)
                 return(Sample_size)
            
 ## ---- end_of_chunk ----
@@ -66,7 +66,7 @@ ComputeSampleSize <-function (dat,input,...){
                                        type = "2p") %>% 
                         unclass() %>% 
                         as_tibble
-                Sample_size$note <- paste("Note:", Sample_size$note)
+               # Sample_size$note <- paste("Note:", Sample_size$note)
                 Sample_size <- Sample_size %>%
                         select("n", "h", everything())
                 return(Sample_size)
@@ -96,7 +96,7 @@ ComputeSampleSize <-function (dat,input,...){
                         as_tibble
 
                 Sample_size$n <- Sample_size$n/Sample_size$k
-                Sample_size$note <- c("Note: n is the sample size *in each group*")
+                Sample_size$note <- c("n is the sample size *in each group*")
                 Sample_size$method <- c("One-way ANOVA")
                 Sample_size <- Sample_size %>%
                         select("n", "f", everything())
@@ -167,7 +167,7 @@ ComputeSampleSize <-function (dat,input,...){
 
                 
                 Sample_size$n <- Sample_size$n/Sample_size$ng
-                Sample_size$note <- c("Note: n is the sample size *in each group*")
+                Sample_size$note <- c("n is the sample size *in each group*")
                 Sample_size$method <- c("Two-way ANOVA")
                 Sample_size <- Sample_size %>%
                         select("name", "n", "f", everything())
