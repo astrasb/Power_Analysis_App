@@ -29,13 +29,21 @@ ui <- fluidPage(
                 column(4,
                        wellPanel(
                                # Input: Select a file
+                               div(h4("Data Input"),
+                                   class = "text-primary"),
                                fileInput("loadfile",
-                                         "Load a file",
-                                         multiple = FALSE)
+                                         "Load a .csv file",
+                                         multiple = FALSE),
+                               style = "padding-top: 0px;
+                               padding-bottom: 0px;"
+                               
                        ),
                        
                        wellPanel(
                                # Input: Select a statisical test
+                               div(h4("Analysis Options"),
+                                   class = "text-primary"
+                               ),
                                selectInput("test_type", 
                                            "Type of Statistical Test:", 
                                            choices = c("Unpaired T-test", 
@@ -55,7 +63,9 @@ ui <- fluidPage(
                                radioButtons("power",
                                             "Power Level",
                                             choices = c(0.80, 0.90, 0.95),
-                                            selected = 0.90)
+                                            selected = 0.90),
+                               style = "padding-top: 0px;
+                               padding-bottom: 0px;"
                        )),
                 
                 # Main panel for displaying outputs
@@ -135,9 +145,30 @@ ui <- fluidPage(
                                        tags$li("Column 2: Factor A Condition 2"),
                                        tags$li("Column 3: Factor B Condition 1"),
                                        tags$li("Column 4: Factor B Condition 2")
-                               )
-                               
-                       ),
+                               ),
+                               fluidRow(
+                                       column(6,
+                                              div(selectInput("example_type", 
+                                                              "Download example .csv file:", 
+                                                              choices = c("Unpaired T-test", 
+                                                                          "Paired T-test", 
+                                                                          "Chi-squared",
+                                                                          "One-way ANOVA", 
+                                                                          "Two-way ANOVA"),
+                                                              selected = "Unpaired T-test"),
+                                                  class = "text-warning",
+                                                  style = "padding-bottom: 0px"),
+                                              div(downloadLink('downloadData',
+                                                                 'Download'),
+                                                  style = "text-align: right;
+                                                  padding-top: 0px"))),
+                               style = "padding-top: 0px;
+                               padding-bottom: 5px;")
+                       
+                )
+        ),
+        fluidRow(
+                column(12,
                        wellPanel(
                                h4("About this application", 
                                   class = "text-primary"),
@@ -154,14 +185,17 @@ ui <- fluidPage(
                                    .noWS = "outside"), '.', 
                                  .noWS = c("after-begin", "before-end"), 
                                  class = "text-muted"
-                               )))))
+                               ),
+                               style = "padding-top: 0px;
+                               padding-bottom: 0px;")
+                )))
 
 ## ---- end_of_chunk ----
 
 # Define Server Logic
 ## ---- ServerLogic ----
 server <- function (input, output){
-        
+        # Sample Size Calculations
         dataOutput <- reactive({
                 req(input$loadfile) ## Don't run the code unless a file has been selected
                 filename <-(input$loadfile$datapath)
@@ -190,6 +224,7 @@ server <- function (input, output){
                 }
         })
         
+        # Explanations of Reported Variables
         output$variables <- renderUI({
                 result<-dataOutput()
                 if (!is.null(result)){
@@ -208,7 +243,7 @@ server <- function (input, output){
                                 str1<- c('<p>d = effect size (Cohens D)</p>')
                                 str3<- c('<p>alternative = direction of the
                                           alternative hypothesis</p>')
-        
+                                
                         } else if (grepl('proportion', method)){
                                 str1<- c('<p>h = effect size</p>')
                                 str3<- c(' ')
@@ -228,6 +263,7 @@ server <- function (input, output){
                         HTML(paste(str0,str1,str2,str3))
                 }})
         
+        # Error Messages
         output$error <- renderUI({
                 result<-dataOutput() 
                 if (is.null(result)){
@@ -246,6 +282,35 @@ server <- function (input, output){
         outputOptions(output, 'sample_size', suspendWhenHidden = FALSE)
         outputOptions(output, 'error', suspendWhenHidden = FALSE)
         
+        # Generate example .csv files for download
+        exampleOutput <- reactive({
+                req(input$example_type) ## Don't run the code unless an output type
+                if (grepl('T-test',input$example_type)){
+                        example_data <- cbind(Control = c(0.3, 0.2, 0.5), 
+                                              Experimental = c(0.8, 0.7, 1.1))
+                } else if (grepl('Chi',input$example_type)){
+                        example_data <- cbind(Control = 0.5, Experimental = 0.8)
+                }else if (grepl('One-way',input$example_type)){
+                        example_data <- cbind(Control = c(0.3, 0.2, 0.5), 
+                                              ExperimentalA = c(0.8, 0.7, 1.1), 
+                                              ExperimentalB = c(0.5, 0.9, 1.3))
+                }else if (grepl('Two-way',input$example_type)){
+                        example_data <- cbind(Control_ConditionA = c(0.3, 0.2, 0.5), 
+                                              Control_ConditionB = c(0.8, 0.7, 1.1), 
+                                              Experimental_ConditionA = c(0.1, 0.2, 1.1),
+                                              Experimental_ConditionB = c(0.5, 0.9, 1.3))
+                }
+        })
+        
+        output$downloadData<- downloadHandler(
+                filename = function(){
+                        paste('example_',input$example_type, '.csv', sep='')
+                },
+                content = function(con) {
+                        example_data <- exampleOutput()
+                        write.csv(example_data,con)
+                }
+        )
 }
 # ---- end_of_chunk ----
 #
