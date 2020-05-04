@@ -1,0 +1,100 @@
+---
+title: "Power Analysis App"
+author: "Astra S. Bryant"
+date: "5/3/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction/Abstract  
+The goal of this project is to generate a Shiny web app for conducing simple power analyses on user-provided data. Most online resources currently require users to provide pre-processed data in the form of individual and group averages. Excel spreadsheets with embedded lookup tables for calculating power analyses require users to be comfortable with several advanced excel features, and assumes familiarity with lookup tables such as those provided by Bausell and Li (2002).  
+
+These requirements may act as a barrier for some researchers. The overall goal of this project is to encourage researchers to conduct power analyses on pilot data by providing a user-friendly web-based application that takes a csv file with raw data as input, and calculates sample sizes for specified power/alpha levels over a set of statistical tests. As much as possible, the results provided by the script have been cross-validating using G*Power.
+
+## Dependencies   
+```{r echo = FALSE}
+library(knitr)
+read_chunk("Power_Analysis_App.r")
+```
+The shiny script is located in the file `Power_Analysis_App.R`, which in turn calls `ComputeSampleSize.R` for the actual calculations. Taken together, the app uses several libraries to calculate effect sizes and power analyses for the separate statistical tests.  
+Key amongst these is the WebPower libary, which handles the power analyses. For background/additional references relating to the WebPower library, [the manual is avaliable here](https://webpower.psychstat.org/wiki/_media/grant/webpower_manual_book.pdf).
+
+
+```{r eval = FALSE}
+<<Dependencies>>
+```
+
+## Define UI  
+For the version 1.0, the user interface was designed to take a .cvs file input containing raw data that will act as pilot data for calculating an effect size. The effect size will them be used to calculate the required sample size, given selected alpha and power levels. Users can select the alpha/power levels they desire; defaults are set to an alpha level of 0.01 and a power level of 0.9.
+
+```{r eval = FALSE}
+<<UI>>
+```
+
+## Define Server Logic / Run the App  
+The server logic section calls a separate R script containing the sample size calculator (see below), and provides text/table output to the UI. The final line runs the app.
+
+```{r eval = FALSE}
+<<ServerLogic>>
+<<runApp>>
+```
+
+## Sample Size Calculator  
+The sample size is calculated in a separate script `ComputeSampleSize.R`. 
+```{r echo = FALSE}
+library(knitr)
+read_chunk("ComputeSampleSize.R")
+```
+
+### Inputs/Outputs
+**Input** from the UI includes the raw data, and the user-selected statistical test type, alpha level, and power level.  
+**Output** to the UI includes the sample size for the desired statistical test, as well as the effect size, alpha level, power level, and notes about whether the given sample sizes refer to the number within a group. In some cases, the output of the WebPower script sample size calculation
+
+### Types of Power Calculations  
+Version 1.0 will calculate the required sample sizes for 5 different types of statistical tests:  
+
+* Unpaired T-test
+* Paired T-test
+* Chi-squared Test
+* One-way ANOVA
+* Two-way ANOA  
+
+For all these tests, the assumption is made that the data are pulled from a normal distribution, i.e. that the statistical test used will be parametric. User's should keep in mind that sample sizes provided may be an underestimation in the case where the intention is to use non-parametric statistical tests. The Prism User Guide suggests that in the absence of easy-to-apply mathematical tools for conducting power analyses of non-parametric data, [values can be estimated calculating the sample size for a parametric test and adding 15%.](https://www.graphpad.com/guides/prism/7/statistics/stat_sample_size_for_nonparametric_.htm)
+
+#### Unpaired T-test
+
+```{r eval = FALSE}
+<<Unpaired_T>>
+
+```
+
+#### Paired T-test
+
+```{r eval = FALSE}
+<<Paired_T>>
+
+```
+
+#### Chi-squared Test
+
+```{r eval = FALSE}
+<<Chi>>
+
+```
+
+#### One-way ANOVA
+
+```{r eval = FALSE}
+<<Onew_ANOVA>>
+
+```
+
+#### Two-way ANOVA
+
+```{r eval = FALSE}
+<<Twow_ANOVA>>
+
+```
