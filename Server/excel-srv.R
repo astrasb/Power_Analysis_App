@@ -8,7 +8,7 @@ output$generate_excel_report <- downloadHandler(
        removeModal() 
     
         # Workbook
-        to_download <- createWorkbook()
+        to_download <<- createWorkbook()
         addWorksheet(wb = to_download, sheetName = vals$inputs)
         
         # Write Data
