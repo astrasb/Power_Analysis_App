@@ -14,9 +14,6 @@ tables: true
 ---
 
 ```{r setup, include=FALSE}
-library(knitr)
-library(rmarkdown)
-library(kableExtra)
 knitr::opts_chunk$set(echo = FALSE)
 options(knitr.table.format = "latex")
 ```
@@ -33,14 +30,14 @@ kable(params$o, booktabs = T)
 ```
 \newline    
 
-#### Analysis Notes  
+### Analysis Notes  
 
 ```{r results = 'asis'}
 cat(paste("<p>", params$n$notes, "</p>"), 
     sep = "\n")
 ```
 
-#### Reported Variables  
+### Reported Variables  
 
 ```{r results = "asis"}
 cat(paste("<p>", params$v$variables, "</p>"), 

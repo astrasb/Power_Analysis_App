@@ -10,6 +10,8 @@ library(powerAnalysis)
 library(shinythemes)
 library(rmarkdown)
 library(openxlsx)
+library(knitr)
+library(kableExtra)
 source("ComputeSampleSize.R")
 ## ---- end_of_chunk ----
 
