@@ -1,0 +1,60 @@
+---
+params:
+        o: 'NA'
+        v: 'NA'
+        t: 'NA'
+        n: 'NA'
+        dat: 'NA'
+        name: 'NA'
+output: 
+        pdf_document:
+                keep_tex: yes
+                latex_engine: xelatex
+tables: true
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(rmarkdown)
+library(kableExtra)
+knitr::opts_chunk$set(echo = FALSE)
+options(knitr.table.format = "latex")
+```
+
+# Power analysis report for a `r params$t`  
+Report generated on `r format(Sys.Date(), "%B %d, %Y")`  
+
+****
+
+## Results of the power analysis:  
+  
+```{r results = 'asis'}
+kable(params$o, booktabs = T)
+```
+\newline    
+
+#### Analysis Notes
+```{r results = 'asis'}
+cat(paste("<p>", params$n$notes, "</p>"), 
+    sep = "\n")
+```
+
+#### Reported Variables
+```{r results = "asis"}
+cat(paste("<p>", params$v$variables, "</p>"), 
+    sep = "\n")
+```
+
+****  
+
+### Inputs to Analysis
+This analysis was generated with the following user-provided pilot data:  
+Source file: `r params$name`.csv  
+
+```{r results = 'asis'}
+knitr::kable(params$dat, booktabs = T)
+```
+
+
+
+

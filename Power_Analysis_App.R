@@ -8,6 +8,8 @@ library(tidyverse)
 library(DescTools)
 library(powerAnalysis)
 library(shinythemes)
+library(rmarkdown)
+library(openxlsx)
 source("ComputeSampleSize.R")
 ## ---- end_of_chunk ----
 
@@ -24,325 +26,62 @@ ui <- fluidPage(
         # Sidebar layout with input and output definitions
         fluidRow(
                 
-                # Sidebar panel for inputs
+                ## Sidebar panel for inputs
                 #sidebarPanel(
-                column(4,
-                       wellPanel(
-                               # Input: Select a file
-                               div(h4("Data Input"),
-                                   class = "text-primary"),
-                               fileInput("loadfile",
-                                         "Load a .csv file",
-                                         multiple = FALSE),
-                               p("For .csv file formatting tips
-                                 and examples, see Application Instructions
-                                 section, below.",
-                                 class = "text-muted"),
-                               style = "padding-top: 0px;
-                               padding-bottom: 0px;"
-                               
-                       ),
-                       
-                       wellPanel(
-                               # Input: Select a statisical test
-                               div(h4("Analysis Options"),
-                                   class = "text-primary"
-                               ),
-                               selectInput("test_type", 
-                                           "Type of Statistical Test:", 
-                                           choices = c("Unpaired T-test", 
-                                                       "Paired T-test", 
-                                                       "Chi-squared",
-                                                       "One-way ANOVA", 
-                                                       "Two-way ANOVA"),
-                                           selected = "Unpaired T-test"),
-                               
-                               # Input: Select an alpha level
-                               radioButtons("alpha",
-                                            "Alpha Level",
-                                            choices = c(0.05, 0.01),
-                                            selected = 0.01),
-                               
-                               # Input: Select a power level
-                               radioButtons("power",
-                                            "Power Level",
-                                            choices = c(0.80, 0.90, 0.95),
-                                            selected = 0.90),
-                               style = "padding-top: 0px;
-                               padding-bottom: 0px;"
-                       )),
+                source("UI/sidebar-ui.R", local = TRUE)$value,
                 
                 # Main panel for displaying outputs
-                column(8,
-                       conditionalPanel(condition = "output.sample_size",
-                                        wellPanel(
-                                                # Output: Test type
-                                                tags$h3(textOutput("test_type"), 
-                                                        class = "text-warning"),
-                                                
-                                                # Outout: Results table with 
-                                                # sample size calculation
-                                                tableOutput("sample_size"),
-                                                
-                                                # Output: Notes re: power analysis
-                                                htmlOutput("test_notes"),
-                                                
-                                                # Output: Explaining the variables
-                                                htmlOutput("variables")
-                                        )
-                                        
-                                        
-                       ),
-                       conditionalPanel(condition = "output.error",
-                                        wellPanel(
-                                                # Output: display error codes
-                                                htmlOutput("error")))
-                       
-                )),
-        
-        ## Useful input for the user
-        fluidRow(
-                column(12,
-                       wellPanel(
-                               h3("Application Instructions", 
-                                  class = "text-primary"),
-                               p("To begin, load a .csv file containing pilot data.
-                                Then select the desired statistical 
-                                test using the pull down menu.
-                                You may also select the desired 
-                                alpha and power levels.
-                                The suggested default is an alpha 
-                                of 0.01 and a power of 0.9."),
-                               h4("Formatting your .CSV input files", 
-                                  class = "text-primary"),
-                               h5("T-tests", 
-                                  class = "text-warning"),
-                               p("Data should be separated into two
-                                adjacent columns (e.g. control vs experimental)."),
-                               tags$ul(
-                                       tags$li("For unpaired tests, 
-                                        the n per condition does 
-                                        not have to be equal."),
-                                       tags$li("For paired tests, the number of rows 
-                                        must either match; 
-                                        uneven rows will be ignored.")
-                               ),
-                               h5("Chi-squared tests", 
-                                  class="text-warning"),
-                               p("Data (proportions) should be
-                               separated into two adjacent columns."),
-                               h5("One-way ANOVA", 
-                                  class = "text-warning"),
-                               p("Data should be separated into at least 3
-                                adjacent columns. The number of 
-                                rows does not have to be even 
-                                across all conditions."),
-                               h5("Two-way ANOVA", 
-                                  class = "text-warning"),
-                               p("The power analysis for both main 
-                                effects and the interaction
-                                effect will be calculated.
-                                Data should be arranged in columns as follows:"), 
-                               tags$ul(
-                                       tags$li("Column 1: Factor A Condition 1"),
-                                       tags$li("Column 2: Factor A Condition 2"),
-                                       tags$li("Column 3: Factor B Condition 1"),
-                                       tags$li("Column 4: Factor B Condition 2")
-                               ),
-                               fluidRow(
-                                       column(6,
-                                              div(selectInput("example_type", 
-                                                "Download example .csv file:", 
-                                                choices = c("Unpaired T-test", 
-                                                            "Paired T-test", 
-                                                            "Chi-squared",
-                                                            "One-way ANOVA", 
-                                                            "Two-way ANOVA"),
-                                                  selected = "Unpaired T-test"),
-                                                  class = "text-warning",
-                                                  style = "padding-bottom: 0px"),
-                                              div(downloadLink('downloadData',
-                                                               'Download'),
-                                                  style = "text-align: right;
-                                                  padding-top: 0px"))),
-                               style = "padding-top: 0px;
-                               padding-bottom: 5px;")
-                       
-                )
+                source("UI/mainPanel-ui.R", local = TRUE)$value
         ),
+        
+        # Application Instructions
         fluidRow(
-                column(12,
-                       wellPanel(
-                               h4("About this application", 
-                                  class = "text-primary"),
-                               p("This Shiny app calculates statistical power analyses 
-                                on user-provided data pilot data. The app takes a .csv 
-                                file with raw data as input, and calculates sample 
-                                sizes for specified power and alpha levels for several 
-                                common statistical tests.", class = "text-muted"),
-                               p("For all these tests, the assumption is made that the 
-                               data are pulled from a normal distribution, 
-                               i.e. that the statistical test used will be parametric. 
-                               Keep in mind that sample sizes provided may be an 
-                               underestimation in the case where the intention is 
-                               to use non-parametric statistical tests. 
-                               The Prism User Guide suggests that in the absence of 
-                               easy-to-apply mathematical tools for conducting power 
-                               analyses of non-parametric data, ", 
-                                 a(href = "https://www.graphpad.com/guides/prism/7/
-                                   statistics/stat_sample_size_for_nonparametric_.htm",
-                                   "values can be estimated calculating the sample size 
-                                   for a parametric test and adding 15%",
-                                   .noWS = "outside"),".",
-                                 .noWS = c("after-begin", "before-end"), 
-                                 class = "text-muted"),
-                               p("These calculations are primarily powered by the 
-                                WebPower Library. For background and/or additional 
-                                references relating to the WebPower library, ", 
-                                 a(href = "https://webpower.psychstat.org/wiki/", 
-                                   "a manual and a wiki site are avaliable online", 
-                                   .noWS = "outside"), '.', 
-                                 .noWS = c("after-begin", "before-end"), 
-                                 class = "text-muted"
-                               ),
-                               p("Created by Astra S, Bryant, PhD",
-                                 class = "text-muted"),
-                               style = "padding-top: 0px;
-                               padding-bottom: 0px;")
-                )))
+                source("UI/appInstructions-ui.R", local = TRUE)$value
+        ),
+        
+        # About this App (Static)
+        fluidRow(
+                source("UI/appNotes-ui.R", local = TRUE)$value
+        )
+)
 
 ## ---- end_of_chunk ----
 
 # Define Server Logic
 ## ---- ServerLogic ----
 server <- function (input, output){
+        # Vals will contain all output variables
+        vals <- reactiveValues(o = NULL, v = NULL, t = NULL, n = NULL, dat = NULL, inputs = NULL)
+        
         # Sample Size Calculations
         dataOutput <- reactive({
                 req(input$loadfile) ## Don't run the code unless a file has been selected
                 filename <-(input$loadfile$datapath)
                 dat <- read.csv(filename)
-                result<-ComputeSampleSize(dat, input)   
+                vals$inputs <- input$loadfile$name %>%
+                        str_split(pattern = ".csv",
+                                  simplify = T) %>%
+                        first()
+                vals$dat <- dat
+                result<-ComputeSampleSize(dat, input, vals)   
         })
         
-        output$sample_size<- renderTable({
-                result<-dataOutput() 
-                if (!is.null(result)){
-                        dplyr::select(result,-c(note,method,url))}
-        })
-        output$test_type <- renderText({
-                result<-dataOutput() 
-                if (!is.null(result)){
-                        dplyr::pull(result,method)%>%
-                                dplyr::first()
-                } 
-        })
-        
-        output$test_notes <- renderUI({
-                result<-dataOutput() 
-                if (!is.null(result)){
-                        str0 <- c('<h4 class = "text-primary">Notes</h4>')
-                        str1 <- dplyr::pull(result,note) %>%
-                                dplyr::first()
-                        str2 <- c('<p class = "text-muted">
-                        This calculation assumes that data are 
-                        pulled from a normal distribution. If you
-                        plan to use a non-parametric test, add 15%
-                        to the calculated n.</p>')
-                        HTML(paste(str0, str1,str2))
-                }
-        })
+        # Parse outputs to Shiny UI
+        source("Server/shinyOutputs-srv.R", local = TRUE)
         
         # Explanations of Reported Variables
-        output$variables <- renderUI({
-                result<-dataOutput()
-                if (!is.null(result)){
-                        method <- dplyr::pull(result,method)
-                        str0 <- paste(
-                                br(),
-                                c('<h4 class = "text-primary"> Reported Variables </h4>'),
-                                c('<p>n = sample size</p>'))
-                        str2 <- paste(
-                                c('<p>alpha = significance level 
-                                          (aka false positive rate)</p>'),
-                                c('<p>power = statistical power 
-                                          (aka 1 - false negative rate)</p>')
-                        )
-                        if (grepl('t-test', method[1])){
-                                str1<- c('<p>d = effect size (Cohens D)</p>')
-                                str3<- c('<p>alternative = direction of the
-                                          alternative hypothesis</p>')
-                                
-                        } else if (grepl('proportion', method[1])){
-                                str1<- c('<p>h = effect size</p>')
-                                str3<- c(' ')
-                                
-                        } else if (grepl('One-way', method[1])){
-                                str1<- paste(
-                                        c('<p>
-                                          f = effect size (f-ratio)</p>'),
-                                        c('<p>
-                                          k = number of groups</p>'))
-                                str3<- c(' ')
-                                
-                        } else if (grepl('Two-way', method[1])){
-                                str1<- c('<p>f = effect size (f-ratio)</p>')
-                                str3<- paste(c('<p>ndf = 
-                                               numerator degrees of freedom</p>'),
-                                             c('<p>ddf = 
-                                               denominator degrees of freedom</p>'),
-                                             c('<p>ng = number of groups</p>'))
-                        }
-                        HTML(paste(str0,str1,str2,str3))
-                }})
+        source("Server/variableCb-srv.R", local = TRUE)
+        
+        # Generate and Download report
+        source("Server/pdf-srv.R", local = TRUE)
+        source("Server/excel-srv.R", local = TRUE)
+        source("Server/modal-srv.R", local = TRUE)
         
         # Error Messages
-        output$error <- renderUI({
-                result<-dataOutput() 
-                if (is.null(result)){
-                        str0 <-c('<h3 class = "text-danger">Warning</h3>')
-                        str1 <-c('<p>Number of data columns or rows does
-                                not match the selected statistical test. </p>
-                                <p>Please pick another file.</p>')
-                        str2 <-c('<p class = "text-muted">
-                                Instructions for correct formating of .csv files 
-                                can be found under the Application Instructions 
-                                section below. </p>')
-                        
-                        HTML(paste(str0,str1, str2,sep = '<br/>'))}
-        })
-        
-        outputOptions(output, 'sample_size', suspendWhenHidden = FALSE)
-        outputOptions(output, 'error', suspendWhenHidden = FALSE)
+        source("Server/error-srv.R", local = TRUE)
         
         # Generate example .csv files for download
-        exampleOutput <- reactive({
-                req(input$example_type) ## Don't run the code unless an output type
-                if (grepl('T-test',input$example_type)){
-                        example_data <- cbind(Control = c(0.3, 0.2, 0.5), 
-                                              Experimental = c(0.8, 0.7, 1.1))
-                } else if (grepl('Chi',input$example_type)){
-                        example_data <- cbind(Control = 0.5, Experimental = 0.8)
-                }else if (grepl('One-way',input$example_type)){
-                        example_data <- cbind(Control = c(0.3, 0.2, 0.5), 
-                                              ExperimentalA = c(0.8, 0.7, 1.1), 
-                                              ExperimentalB = c(0.5, 0.9, 1.3))
-                }else if (grepl('Two-way',input$example_type)){
-                        example_data <- cbind(Control_ConditionA = c(0.3, 0.2, 0.5), 
-                                              Control_ConditionB = c(0.8, 0.7, 1.1), 
-                                              Experimental_ConditionA = c(0.1, 0.2, 1.1),
-                                              Experimental_ConditionB = c(0.5, 0.9, 1.3))
-                }
-        })
-        
-        output$downloadData<- downloadHandler(
-                filename = function(){
-                        paste('example_',input$example_type, '.csv', sep='')
-                },
-                content = function(con) {
-                        example_data <- exampleOutput()
-                        write.csv(example_data,con)
-                }
-        )
+        source("Server/exampleCSV-srv.R", local = TRUE)
 }
 # ---- end_of_chunk ----
 #
