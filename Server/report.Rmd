@@ -33,13 +33,15 @@ kable(params$o, booktabs = T)
 ```
 \newline    
 
-#### Analysis Notes
+#### Analysis Notes  
+
 ```{r results = 'asis'}
 cat(paste("<p>", params$n$notes, "</p>"), 
     sep = "\n")
 ```
 
-#### Reported Variables
+#### Reported Variables  
+
 ```{r results = "asis"}
 cat(paste("<p>", params$v$variables, "</p>"), 
     sep = "\n")
@@ -47,7 +49,7 @@ cat(paste("<p>", params$v$variables, "</p>"),
 
 ****  
 
-### Inputs to Analysis
+### Inputs to Analysis  
 This analysis was generated with the following user-provided pilot data:  
 Source file: `r params$name`.csv  
 
