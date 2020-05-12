@@ -28,7 +28,7 @@ ComputeSampleSize <-function (dat,input,...){
                 dat_complete$id <- (1:n)
         
                 dat_melt <- reshape2::melt(dat_complete,
-                                 measure.vars = c("Control", "Experimental"),
+                                 measure.vars = 1:2,
                                  variable.name = 'condition',
                                  value.name = 'result',
                                  na.rm = TRUE)
