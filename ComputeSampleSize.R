@@ -99,7 +99,7 @@ ComputeSampleSize <-function (dat,input,...){
                 Sample_size$note <- c("n is the sample size *in each group*")
                 Sample_size$method <- c("One-way ANOVA")
                 Sample_size <- Sample_size %>%
-                        select("n", "f", everything())
+                        dplyr::select("n", "f", everything())
                 return(Sample_size)
       
 ## ---- end_of_chunk ----
@@ -170,7 +170,7 @@ ComputeSampleSize <-function (dat,input,...){
                 Sample_size$note <- c("n is the sample size *in each group*")
                 Sample_size$method <- c("Two-way ANOVA")
                 Sample_size <- Sample_size %>%
-                        select("name", "n", "f", everything())
+                        dplyr::select("name", "n", "f", everything())
                 return(Sample_size)
         }
 ## ---- end_of_chunk ----
