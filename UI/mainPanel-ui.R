@@ -21,10 +21,10 @@ column(8,
                             uiOutput("variables"),
                             
                             ## Alternative Download
-                            actionButton(
-                                "generate_report_modal",
-                                "Create Report",
-                                class = "btn btn-primary"
+                            downloadButton(
+                                    "generate_excel_report",
+                                    "Create Excel Report",
+                                    class = "btn btn-primary"
                             )
                         )
                         

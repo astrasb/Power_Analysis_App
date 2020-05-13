@@ -6,16 +6,30 @@ params:
         n: 'NA'
         dat: 'NA'
         name: 'NA'
-output: 
-        pdf_document:
-                keep_tex: yes
-                latex_engine: xelatex
+header-includes:
+  - \usepackage{booktabs}
+  - \usepackage{longtable}
+  - \usepackage{array}
+  - \usepackage{multirow}
+  - \usepackage{wrapfig}
+  - \usepackage{float}
+  - \usepackage{colortbl}
+  - \usepackage{pdflscape}
+  - \usepackage{tabu}
+  - \usepackage{threeparttable}
+  - \usepackage{threeparttablex}
+  - \usepackage[normalem]{ulem}
+  - \usepackage{makecell}
+  - \usepackage{xcolor}
+output: pdf_document
+classoption: landscape        
 tables: true
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 options(knitr.table.format = "latex")
+library(kableExtra)
 ```
 
 # Power analysis report for a `r params$t`  
@@ -51,7 +65,8 @@ This analysis was generated with the following user-provided pilot data:
 Source file: `r params$name`  
 
 ```{r results = 'asis'}
-knitr::kable(params$dat, booktabs = T)
+a<-knitr::kable(params$dat, booktabs = T)
+kable_styling(a, latex_options = "scale_down")
 ```
 
 

@@ -12,8 +12,8 @@ library(shinythemes)
 library(rmarkdown)
 library(openxlsx)
 library(knitr)
-library(kableExtra)
-source("ComputeSampleSize.R")
+library(xtable)
+source("Server/ComputeSampleSize.R")
 ## ---- end_of_chunk ----
 
 
@@ -85,9 +85,7 @@ server <- function (input, output){
         source("Server/variableCb-srv.R", local = TRUE)
         
         # Generate and Download report
-        source("Server/pdf-srv.R", local = TRUE)
         source("Server/excel-srv.R", local = TRUE)
-        source("Server/modal-srv.R", local = TRUE)
         
         # Error Messages
         source("Server/error-srv.R", local = TRUE)
