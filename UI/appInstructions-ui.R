@@ -2,19 +2,22 @@ column(12,
        wellPanel(
                h3("Application Instructions", 
                   class = "text-primary"),
-               p("To begin, load a .csv file containing pilot data.
+               p("To begin, load an Excel or a .csv file containing pilot data.
                                 Then select the desired statistical 
                                 test using the pull down menu.
                                 You may also select the desired 
                                 alpha and power levels.
                                 The suggested default is an alpha 
                                 of 0.01 and a power of 0.9."),
-               h4("Formatting your .CSV input files", 
+               h4("Formatting your input files", 
                   class = "text-primary"),
+               p("Warning, the .csv format is often finicky. Make sure 
+                                that your file does not have extraneous 
+                                'empty' data columns."),
                h5("T-tests", 
                   class = "text-warning"),
                p("Data should be separated into two
-                                adjacent columns (e.g. control vs experimental)."),
+                 adjacent columns (e.g. control vs experimental)."),
                tags$ul(
                        tags$li("For unpaired tests, 
                                         the n per condition does 

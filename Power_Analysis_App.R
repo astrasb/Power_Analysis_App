@@ -5,6 +5,7 @@ library(WebPower)
 library(reshape2)
 library(effsize)
 library(tidyverse)
+library(readxl)
 library(DescTools)
 library(powerAnalysis)
 library(shinythemes)
@@ -59,11 +60,20 @@ server <- function (input, output){
         dataOutput <- reactive({
                 req(input$loadfile) ## Don't run the code unless a file has been selected
                 filename <-(input$loadfile$datapath)
-                dat <- read.csv(filename)
-                vals$inputs <- input$loadfile$name %>%
-                        str_split(pattern = ".csv",
-                                  simplify = T) %>%
-                        first()
+                split_filename<-SplitPath(input$loadfile$name)
+                
+                ## Import Data, either an xls/xlsx or a csv file
+                validate(need(split_filename$extension == "xls"|| 
+                                      split_filename$extension == "xlsx" ||
+                                      split_filename$extension == "csv",
+                              message = "Please select an Excel or .csv file"))
+                
+                if (split_filename$extension == "xls" || split_filename$extension == "xlsx"){
+                        dat <- read_excel(filename)
+                } else if (split_filename$extension == "csv") {
+                        dat <- read.csv(filename)}
+                
+                vals$inputs <- split_filename$fullfilename
                 vals$dat <- dat
                 result<-ComputeSampleSize(dat, input, vals)   
         })

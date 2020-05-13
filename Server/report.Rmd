@@ -48,7 +48,7 @@ cat(paste("<p>", params$v$variables, "</p>"),
 
 ### Inputs to Analysis  
 This analysis was generated with the following user-provided pilot data:  
-Source file: `r params$name`.csv  
+Source file: `r params$name`  
 
 ```{r results = 'asis'}
 knitr::kable(params$dat, booktabs = T)

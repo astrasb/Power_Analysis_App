@@ -83,8 +83,7 @@ output$generate_excel_report <- downloadHandler(
                 "User-provided pilot data",
                 paste0(
                 "Soure file: ",
-                vals$inputs,
-                ".csv"
+                vals$inputs
                 )
             )
         )
