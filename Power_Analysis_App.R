@@ -54,7 +54,8 @@ ui <- fluidPage(
 ## ---- ServerLogic ----
 server <- function (input, output){
         # Vals will contain all output variables
-        vals <- reactiveValues(o = NULL, v = NULL, t = NULL, n = NULL, dat = NULL, inputs = NULL)
+        vals <- reactiveValues(o = NULL, v = NULL, t = NULL, 
+                               n = NULL, dat = NULL, inputs = NULL)
         
         # Sample Size Calculations
         dataOutput <- reactive({
@@ -68,7 +69,8 @@ server <- function (input, output){
                                       split_filename$extension == "csv",
                               message = "Please select an Excel or .csv file"))
                 
-                if (split_filename$extension == "xls" || split_filename$extension == "xlsx"){
+                if (split_filename$extension == "xls" || 
+                    split_filename$extension == "xlsx"){
                         dat <- read_excel(filename)
                 } else if (split_filename$extension == "csv") {
                         dat <- read.csv(filename)}

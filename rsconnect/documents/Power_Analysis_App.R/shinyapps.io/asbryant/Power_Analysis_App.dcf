@@ -5,9 +5,9 @@ account: asbryant
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 2240249
-bundleId: 3139609
+bundleId: 3143001
 url: https://asbryant.shinyapps.io/Power_Analysis_App/
-when: 1589325824.79242
+when: 1589388427.50637
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: Power Analysis App.Rmd|Power-Analysis-App.pdf|README.md|Data
+ignoredFiles: Power Analysis App.Rmd|Power-Analysis-App.pdf|README.md|Data/.DS_Store|Data/sample_2wanova.csv|Data/sample_anova.csv|Data/sample_chisquared.csv|Data/sample_data.csv|Unused/modal-srv.R|Unused/pdf-srv.R|Unused/report.Rmd

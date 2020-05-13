@@ -28,10 +28,34 @@ Key amongst these is the WebPower libary, which handles the power analyses. For 
 ```
 
 ## Define UI  
-For the version 1.0, the user interface was designed to take a .cvs file input containing raw data that will act as pilot data for calculating an effect size. The effect size will them be used to calculate the required sample size, given selected alpha and power levels. Users can select the alpha/power levels they desire; defaults are set to an alpha level of 0.01 and a power level of 0.9.
+The user interface was designed to take either an excel file or a .cvs file input containing raw data that will act as pilot data for calculating an effect size. The effect size will them be used to calculate the required sample size, given selected alpha and power levels. Users can select the alpha/power levels they desire; defaults are set to an alpha level of 0.01 and a power level of 0.9.
 
 ```{r eval = FALSE}
 <<UI>>
+```
+
+### UI Sidebar  
+Source = `UI/sidebar-ui.R`
+```{r code = readLines('UI/sidebar-ui.R', warn = FALSE), eval = FALSE}
+
+```
+
+### UI Main Panel  
+Source = `UI/mainPanel-ui.R`
+```{r code = readLines('UI/mainPanel-ui.R', warn = FALSE), eval = FALSE}
+
+```
+
+### UI Application Instructions
+Source = `UI/appInstructions-ui.R`
+```{r code = readLines('UI/appInstructions-ui.R', warn = FALSE), eval = FALSE}
+
+```
+
+### UI Static Application Notes
+Source = `UI/appNotes-ui.R`
+```{r code = readLines('UI/appNotes-ui.R', warn = FALSE), eval = FALSE}
+
 ```
 
 ## Define Server Logic / Run the App  
@@ -42,19 +66,46 @@ The server logic section calls a separate R script containing the sample size ca
 <<runApp>>
 ```
 
+### Parse Outputs to Shiny UI
+Source = `Server/shinyOutputs-srv.R`
+```{r code = readLines('Server/shinyOutputs-srv.R', warn = FALSE), eval = FALSE}
+
+```
+
+### Generate a "Codebook" of Returned Variables
+Source = `Server/variableCb-srv.R`
+```{r code = readLines('Server/variableCb-srv.R', warn = FALSE), eval = FALSE}
+
+```
+
+#### Generate Error Messages
+Source = `Server/error-srv.R`
+```{r code = readLines('Server/error-srv.R', warn = FALSE), eval = FALSE}
+
+```
+
+#### Generate Example .csv Files
+These can be downloaded from a handle in the static AppNotes section
+Source = `Server/exampleCSV-srv.R`
+```{r code = readLines('Server/exampleCSV-srv.R', warn = FALSE), eval = FALSE}
+
+```
+
 ## Sample Size Calculator  
 The sample size is calculated in a separate script `ComputeSampleSize.R`. 
 ```{r echo = FALSE}
 library(knitr)
-read_chunk("ComputeSampleSize.R")
+read_chunk("Server/ComputeSampleSize.R")
 ```
 
 ### Inputs/Outputs
 **Input** from the UI includes the raw data, and the user-selected statistical test type, alpha level, and power level.  
-**Output** to the UI includes the sample size for the desired statistical test, as well as the effect size, alpha level, power level, and notes about whether the given sample sizes refer to the number within a group. In some cases, the output of the WebPower script sample size calculation
+**Output** to the UI includes the sample size for the desired statistical test, as well as the effect size, alpha level, power level, and notes about whether the given sample sizes refer to the number within a group. 
+
+Users may download an excel report containing the outputs and a copy of the inputs.
 
 ### Types of Power Calculations  
-Version 1.0 will calculate the required sample sizes for 5 different types of statistical tests:  
+The app will calculate the required sample sizes for 5 different types of statistical tests:  
 
 * Unpaired T-test
 * Paired T-test
