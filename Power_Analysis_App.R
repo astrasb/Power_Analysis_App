@@ -75,7 +75,8 @@ server <- function (input, output){
                 } else if (split_filename$extension == "csv") {
                         dat <- read.csv(filename)}
                 
-                vals$inputs <- split_filename$fullfilename
+                vals$fullfilename <- split_filename$fullfilename
+                vals$filename <-split_filename$filename
                 vals$dat <- dat
                 result<-ComputeSampleSize(dat, input, vals)   
         })

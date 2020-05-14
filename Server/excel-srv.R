@@ -1,7 +1,7 @@
 output$generate_excel_report <- downloadHandler(
 
     filename = function(){
-        paste(vals$inputs,"_PowerAnalysis_",Sys.Date(),".xlsx",sep = "")
+        paste(vals$filename,"_PowerAnalysis_",Sys.Date(),".xlsx",sep = "")
     },
     
     content = function(file){
@@ -9,7 +9,7 @@ output$generate_excel_report <- downloadHandler(
     
         # Workbook
         to_download <<- createWorkbook()
-        addWorksheet(wb = to_download, sheetName = vals$inputs)
+        addWorksheet(wb = to_download, sheetName = vals$filename)
         
         # Write Data
         ## Sheet header
@@ -83,7 +83,7 @@ output$generate_excel_report <- downloadHandler(
                 "User-provided pilot data",
                 paste0(
                 "Soure file: ",
-                vals$inputs
+                vals$fullfilename
                 )
             )
         )
