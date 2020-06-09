@@ -25,7 +25,6 @@ output$test_type <- renderText({
 output$test_notes <- renderUI({
     result<-dataOutput() 
     if (!is.null(result)){
-        #str0 <- c('<h4 class = "text-primary">Notes</h4>')
         str0 <- dplyr::pull(result,note) %>%
             dplyr::first() %>%
             paste(". ", sep = "")
