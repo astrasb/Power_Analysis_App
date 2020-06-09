@@ -52,7 +52,7 @@ ui <- fluidPage(
 
 # Define Server Logic
 ## ---- ServerLogic ----
-server <- function (input, output){
+server <- function (input, output, session){
         # Vals will contain all output variables
         vals <- reactiveValues(o = NULL, v = NULL, t = NULL, 
                                n = NULL, dat = NULL, inputs = NULL)
@@ -95,6 +95,8 @@ server <- function (input, output){
         
         # Generate example .csv files for download
         source("Server/exampleCSV-srv.R", local = TRUE)
+        
+        session$onSessionEnded(stopApp)
 }
 # ---- end_of_chunk ----
 #
