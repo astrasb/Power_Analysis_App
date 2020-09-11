@@ -1,6 +1,8 @@
 # Shiny App
 ## ---- Dependencies ----
 library(shiny)
+library(shinyWidgets)
+library(htmltools)
 library(WebPower)
 library(reshape2)
 library(effsize)
@@ -21,20 +23,22 @@ source("Server/ComputeSampleSize.R")
 ## ---- UI ----
 
 ui <- fluidPage(
-        theme = shinytheme("darkly"),
+        theme = shinytheme("flatly"),
         
         # App title
-        titlePanel("Sample Size Calculator"),
+        titlePanel(title = h3(shiny::icon("fas fa-calculator"), "Sample Size Calculator", style = "background-color: #2C3E50; color: white; padding: 20px 15px;"), windowTitle = "Sample Size Calc"),
         
-        # Sidebar layout with input and output definitions
+        # Panel layout with input and output definitions
         fluidRow(
                 
                 ## Sidebar panel for inputs
-                #sidebarPanel(
-                source("UI/sidebar-ui.R", local = TRUE)$value,
+                
+                source("UI/navbar-ui.R", local = TRUE)$value,
                 
                 # Main panel for displaying outputs
-                source("UI/mainPanel-ui.R", local = TRUE)$value
+                source("UI/mainPanel-ui.R", local = TRUE)$value,
+                
+                source("UI/custom_css.R", local = T)$value
         ),
         
         # Application Instructions
@@ -57,28 +61,61 @@ server <- function (input, output, session){
         vals <- reactiveValues(o = NULL, v = NULL, t = NULL, 
                                n = NULL, dat = NULL, inputs = NULL)
         
+        # Generate/Refresh File Upload UI
+        output$file_upload <- renderUI({
+                input$reset
+                fileInput("loadfile",
+                          h5("Upload an input file (Excel or.csv)"),
+                          multiple = FALSE)
+        })
+        
+        # Reset Actions
+        observeEvent(input$reset,{
+                updateTextAreaInput(session, "textdat", value = "")
+                updatePickerInput(session, "test_type", selected = "Unpaired T-test")
+                updateRadioButtons(session, "alpha", selected = 0.01)
+                updateRadioButtons(session, "power", selected = 0.90)
+                vals$dat <- NULL
+        })
+        
         # Sample Size Calculations
-        dataOutput <- reactive({
+        dataOutput <- eventReactive(input$goButton, {
+                if(isTruthy(input$textdat)){
+                dat.string <- unlist(str_split(input$textdat,";"))
+                dat <-sapply(dat.string, function(x){
+                        y <- str_split(x, pattern = "\n")
+                        as.numeric(y[[1]]) %>% na.omit()       
+                }, USE.NAMES = F) 
+                if(class(dat) == "list"){
+                dat <- plyr::ldply(dat, rbind) %>% 
+                        t()}
+                dat <- as.data.frame(dat)
+                vals$filename<-'UserData'
+                
+                } else if(isTruthy(input$loadfile)){
+
                 req(input$loadfile) ## Don't run the code unless a file has been selected
                 filename <-(input$loadfile$datapath)
                 split_filename<-SplitPath(input$loadfile$name)
-                
+
                 ## Import Data, either an xls/xlsx or a csv file
-                validate(need(split_filename$extension == "xls"|| 
+                validate(need(split_filename$extension == "xls"||
                                       split_filename$extension == "xlsx" ||
                                       split_filename$extension == "csv",
                               message = "Please select an Excel or .csv file"))
-                
-                if (split_filename$extension == "xls" || 
+
+                if (split_filename$extension == "xls" ||
                     split_filename$extension == "xlsx"){
                         dat <- read_excel(filename)
                 } else if (split_filename$extension == "csv") {
                         dat <- read.csv(filename)}
-                
+
                 vals$fullfilename <- split_filename$fullfilename
                 vals$filename <-split_filename$filename
+                }
+                
                 vals$dat <- dat
-                result<-ComputeSampleSize(dat, input, vals)   
+                result<-suppressMessages(ComputeSampleSize(dat, input, vals))   
         })
         
         # Parse outputs to Shiny UI

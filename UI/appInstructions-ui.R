@@ -1,20 +1,27 @@
 column(12,
-       wellPanel(
-               h3("Application Instructions", 
-                  class = "text-primary"),
-               p("To begin, load an Excel or a .csv file containing pilot data.
+       panel(
+               heading = tagList(h4(shiny::icon("fas fa-question-circle"),"Application Instructions")),
+               status = "primary",
+               h5("Using the App"),
+               p("To begin, use the text box to type pilot data, or load either an 
+               Excel or a .csv file containing pilot data.
                                 Then select the desired statistical 
                                 test using the pull down menu.
                                 You may also select the desired 
                                 alpha and power levels.
                                 The suggested default is an alpha 
-                                of 0.01 and a power of 0.9."),
-               h4("Formatting your input files", 
+                                of 0.01 and a power of 0.9.
+                 Press the Submit button when you are ready to analyze your data."),
+               p("If using the text box, data should be formatted such that 
+                 columns are separated by semicolons, and rows are separated by 
+                 carriage returns. The appropriate row formatting can be achieved
+                 by pasting data from excel. Do not include column headers."),
+               h5("Formatting your input files", 
                   class = "text-primary"),
                p("Warning, the .csv format is often finicky. Make sure 
                                 that your file does not have extraneous 
                                 'empty' data columns."),
-               h5("T-tests", 
+               h6("T-tests", 
                   class = "text-warning"),
                p("Data should be separated into two
                  adjacent columns (e.g. control vs experimental)."),
@@ -26,17 +33,17 @@ column(12,
                                         must either match; 
                                         uneven rows will be ignored.")
                ),
-               h5("Chi-squared tests", 
+               h6("Chi-squared tests", 
                   class="text-warning"),
                p("Data (proportions) should be
                                separated into two adjacent columns."),
-               h5("One-way ANOVA", 
+               h6("One-way ANOVA", 
                   class = "text-warning"),
                p("Data should be separated into at least 3
                                 adjacent columns. The number of 
                                 rows does not have to be even 
                                 across all conditions."),
-               h5("Two-way ANOVA", 
+               h6("Two-way ANOVA", 
                   class = "text-warning"),
                p("The power analysis for both main 
                                 effects and the interaction
@@ -48,22 +55,20 @@ column(12,
                        tags$li("Column 3: Factor B Condition 1"),
                        tags$li("Column 4: Factor B Condition 2")
                ),
-               fluidRow(
-                       column(6,
-                              div(selectInput("example_type", 
-                                              "Download example .csv file:", 
+               
+                               div(
+               selectInput("example_type", 
+                                              h6("Download example .csv file:"), 
                                               choices = c("Unpaired T-test", 
                                                           "Paired T-test", 
                                                           "Chi-squared",
                                                           "One-way ANOVA", 
                                                           "Two-way ANOVA"),
                                               selected = "Unpaired T-test"),
-                                  class = "text-warning",
-                                  style = "padding-bottom: 0px"),
-                              div(downloadLink('downloadData',
+               class = "text-warning",
+                                 style = "padding-bottom: 0px"),
+               div(downloadButton('downloadData',
                                                'Download'),
-                                  style = "text-align: right;
-                                                  padding-top: 0px"))),
-               style = "padding-top: 0px;
-                               padding-bottom: 5px;")
+                   style ="padding-top: 0px")
+       )
 )
