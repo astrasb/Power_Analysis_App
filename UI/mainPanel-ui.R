@@ -9,7 +9,7 @@ column(8,
                             tags$h4(textOutput("test_type"), 
                                     class = "text-danger"),
                             
-                            ## Outout: Results table with 
+                            ## Output: Results table with 
                             # sample size calculation
                             tableOutput("sample_size"),
                             

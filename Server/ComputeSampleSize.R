@@ -1,5 +1,18 @@
 ComputeSampleSize <-function (dat,input,...){
+## ---- Parse Inputs ----
+        if (input$alpha == "Custom"){
+           alpha <- as.numeric(input$customAlpha)    
+        } else {
+                alpha <- as.numeric(input$alpha)
+        }
+        
+        if (input$power == "Custom"){
+                power <- as.numeric(input$customPower)
+        } else {
+        power <- as.numeric(input$power)
+        }
 ## ---- Unpaired_T ----
+
         if (input$test_type == "Unpaired T-test"){
                 if (ncol(dat) > 2){return(NULL)}
                 if (nrow(dat) < 2){return(NULL)}
@@ -11,8 +24,8 @@ ComputeSampleSize <-function (dat,input,...){
                 ES <- cohen.d(d = dat_melt$result, f = dat_melt$condition)
                 
                 Sample_size <- wp.t(d = ES$estimate, 
-                                    alpha = as.numeric(input$alpha),
-                                    power = as.numeric(input$power),
+                                    alpha = alpha,
+                                    power = power,
                                     type = "two.sample")%>% 
                         unclass() %>% 
                         as_tibble
@@ -41,8 +54,8 @@ ComputeSampleSize <-function (dat,input,...){
                 
                 
                 Sample_size <- wp.t(d = ES$estimate,
-                                    alpha = as.numeric(input$alpha),
-                                    power = as.numeric(input$power),
+                                    alpha = alpha,
+                                    power = power,
                                     type = "paired") %>% 
                         unclass() %>% 
                         as_tibble
@@ -60,8 +73,10 @@ ComputeSampleSize <-function (dat,input,...){
                 ES <- (2 * asin(sqrt(dat_melt$proportion[[1]]))) - 
                         (2 * asin(sqrt(dat_melt$proportion[[2]])))
                 Sample_size <- wp.prop(h = ES, 
-                                       alpha = 0.01, ##as.numeric(input$alpha),
-                                       power = 0.9, ##as.numeric(input$power),
+                                       alpha = alpha,
+                                       power = power,
+                                       ##alpha = 0.01,
+                                       ##power = 0.9,
                                        type = "2p") %>% 
                         unclass() %>% 
                         as_tibble
@@ -92,8 +107,8 @@ ComputeSampleSize <-function (dat,input,...){
                 CohensF <- sqrt(etasquared[2]/(1-etasquared[2]))
                 Sample_size <- wp.anova(k = k,
                                         f = CohensF,
-                                        alpha = as.numeric(input$alpha),
-                                        power = as.numeric(input$power)) %>% 
+                                        alpha = alpha,
+                                        power = power,) %>% 
                         unclass() %>% 
                         as_tibble
 
@@ -155,18 +170,18 @@ ComputeSampleSize <-function (dat,input,...){
                 
                 Sample_size_Interaction <- wp.kanova(f = CohensF[
                         "dat_melt$Var1:dat_melt$Var2"], 
-                                                     ndf = ndf[3],
-                                                     alpha = as.numeric(input$alpha),
-                                                     power = as.numeric(input$power),
-                                                     ng = 4) %>% 
+                        ndf = ndf[3],
+                        alpha = alpha,
+                        power = power,
+                        ng = 4) %>% 
                         unclass() %>% 
                         as_tibble %>% 
                         add_column(name = 'Interaction Effect', .before = "n")
                 
                 Sample_size_Var1 <- wp.kanova(f = CohensF["dat_melt$Var1"],
                                               ndf = ndf[1],
-                                              alpha = as.numeric(input$alpha),
-                                              power = as.numeric(input$power),
+                                              alpha = alpha,
+                                              power = power,
                                               ng = 4) %>% 
                         unclass() %>%
                         as_tibble %>% 
@@ -174,8 +189,8 @@ ComputeSampleSize <-function (dat,input,...){
                 
                 Sample_size_Var2 <- wp.kanova(f = CohensF["dat_melt$Var2"],
                                               ndf = ndf[2],
-                                              alpha = as.numeric(input$alpha),
-                                              power = as.numeric(input$power),
+                                              alpha = alpha,
+                                              power = power,
                                               ng = 4) %>% 
                         unclass() %>% 
                         as_tibble() %>% 

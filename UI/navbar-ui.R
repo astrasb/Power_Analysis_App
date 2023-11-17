@@ -20,7 +20,7 @@ column(4,
                tags$hr(style= "border-color: #2C3E50;"),
                
                h4(shiny::icon("fas fa-sliders-h"), "Step 2: Select Analysis Options", class = "text-danger"),
-               ## Input: Select a statisical test
+               ## Input: Select a statistical test
                selectInput("test_type", 
                            h5("Type of Statistical Test:"), 
                            choices = c("Unpaired T-test", 
@@ -33,14 +33,25 @@ column(4,
                ## Input: Select an alpha level
                radioButtons("alpha",
                             h5("Alpha Level"),
-                            choices = c(0.05, 0.01),
+                            choices = c(0.05, 0.01, 'Custom'),
                             selected = 0.01),
+              
+               ## Input: Provide a custom alpha level
+               textInput("customAlpha",
+                         h6("Input a custom alpha value"),
+                         "0.001"),
                
                ## Input: Select a power level
                radioButtons("power",
                             h5("Power Level"),
-                            choices = c(0.80, 0.90, 0.95),
+                            choices = c(0.80, 0.90, 0.95, 'Custom'),
                             selected = 0.90),
+               
+               ## Input: Provide a custom power level
+               textInput("customPower",
+                         h6("Input a custom power value"),
+                         "0.99"),
+               
                actionButton("goButton",
                             "Submit",
                             icon = shiny::icon("fas fa-share"),
